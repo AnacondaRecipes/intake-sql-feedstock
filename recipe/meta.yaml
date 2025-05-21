@@ -22,7 +22,7 @@ build:
 
 requirements:
   build:
-    - perl
+    - perl  # [not win]
   host:
     - python
     - pip
