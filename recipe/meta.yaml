@@ -13,12 +13,12 @@ source:
 
 build:
   number: 0
-  script: |
-# Replace deprecated SafeConfigParser with ConfigParser
-# Use perl for cross-platform compatibility
-    perl -pi -e 's/configparser\.SafeConfigParser/configparser.ConfigParser/g' versioneer.py
-    perl -pi -e 's/parser\.readfp/parser.read_file/g' versioneer.py
-    {{ PYTHON }} -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -vv
+  script:
+    # Replace deprecated SafeConfigParser with ConfigParser
+    # Use perl for cross-platform compatibility
+    - perl -pi -e 's/configparser\.SafeConfigParser/configparser.ConfigParser/g' versioneer.py
+    - perl -pi -e 's/parser\.readfp/parser.read_file/g' versioneer.py
+    - {{ PYTHON }} -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -vv
 
 requirements:
   build:
