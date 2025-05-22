@@ -13,29 +13,47 @@ source:
 
 build:
   number: 0
-  noarch: python
-  script: {{ PYTHON }}  -m pip install . --no-deps --ignore-installed -vv
+  script:
+    # Replace deprecated SafeConfigParser with ConfigParser
+    # Use perl for cross-platform compatibility
+    - perl -pi -e 's/configparser\.SafeConfigParser/configparser.ConfigParser/g' versioneer.py
+    - perl -pi -e 's/parser\.readfp/parser.read_file/g' versioneer.py
+    - {{ PYTHON }} -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -vv
 
 requirements:
+  build:
+    - perl  # [not win]
   host:
-    - python >=3.5
+    - python
     - pip
     - jinja2
+    - wheel
   run:
-    - python >=3.5
+    - python
     - intake >=0.3
     - pandas
-    - sqlalchemy
+    - sqlalchemy >2
 
 test:
   imports:
     - intake_sql
-
+  commands:
+    - pip check
+  requires:
+    - pip
+#keg
 about:
-  home: https://github.com/ContinuumIO/intake-sql
+  home: https://github.com/intake/intake-sql
   license: BSD-2-Clause
+  license_family: BSD
   license_file: LICENSE
   summary: SQL table and catalog plugins for Intake
+  description: |
+    Plugin for Intake to read from SQL servers. This package enables reading
+    data from a variety of SQL databases using SQLAlchemy. It provides both
+    direct table reading and custom query capabilities for Intake catalogs.
+  doc_url: https://intake-sql.readthedocs.io/
+  dev_url: https://github.com/intake/intake-sql
 
 extra:
   recipe-maintainers:
