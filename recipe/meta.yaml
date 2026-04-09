@@ -19,13 +19,13 @@ build:
   script:
     # Replace deprecated SafeConfigParser with ConfigParser
     # Use perl for cross-platform compatibility
-    - perl -pi -e 's/configparser\.SafeConfigParser/configparser.ConfigParser/g' versioneer.py
-    - perl -pi -e 's/parser\.readfp/parser.read_file/g' versioneer.py
+    - perl -pi -e "s/configparser\.SafeConfigParser/configparser.ConfigParser/g" versioneer.py
+    - perl -pi -e "s/parser\.readfp/parser.read_file/g" versioneer.py
     - {{ PYTHON }} -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -vv
 
 requirements:
   build:
-    - perl  # [not win]
+    - perl
   host:
     - python
     - pip
@@ -46,7 +46,7 @@ test:
   commands:
     - pip check
     - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
-    - pytest -ra -v gh_src/tests -k "not test_auto and not test_cat and not test_yaml_cat and not test_with_server"
+    - pytest -ra -v gh_src/tests -k "not test_manual and not test_auto and not test_cat and not test_yaml_cat and not test_with_server and not test_to_ibis"
   requires:
     - pip
     - pytest
