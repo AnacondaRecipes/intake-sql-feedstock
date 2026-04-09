@@ -1,18 +1,21 @@
 {% set version = "0.4.0" %}
 {% set name = "intake-sql" %}
-{% set sha256 = "c79b0f7d484d569d990f32067cb01a5ef565522a657955d264b316a1b0c0d4c6" %}
 
 package:
   name: {{ name }}
   version: {{ version }}
 
 source:
-  fn: {{ name }}-{{ version }}.tar.gz
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: {{ sha256 }}
+  - url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+    sha256: c79b0f7d484d569d990f32067cb01a5ef565522a657955d264b316a1b0c0d4c6
+
+    # Github src for TESTS only
+  - url: https://github.com/intake/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
+    sha256: 713f2b2479ea0c706b5c69898d369313705b9c1bffd54ba6543653b059635615
+    folder: gh_src
 
 build:
-  number: 0
+  number: 1
   script:
     # Replace deprecated SafeConfigParser with ConfigParser
     # Use perl for cross-platform compatibility
@@ -27,6 +30,7 @@ requirements:
     - python
     - pip
     - jinja2
+    - setuptools
     - wheel
   run:
     - python
@@ -35,13 +39,20 @@ requirements:
     - sqlalchemy >2
 
 test:
+  source_files:
+    - gh_src/tests
   imports:
     - intake_sql
   commands:
     - pip check
+    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
+    - pytest -ra -v gh_src/tests -k "not test_auto and not test_cat and not test_yaml_cat and not test_with_server"
   requires:
     - pip
-#keg
+    - pytest
+    - requests
+    - dask
+
 about:
   home: https://github.com/intake/intake-sql
   license: BSD-2-Clause
@@ -52,7 +63,7 @@ about:
     Plugin for Intake to read from SQL servers. This package enables reading
     data from a variety of SQL databases using SQLAlchemy. It provides both
     direct table reading and custom query capabilities for Intake catalogs.
-  doc_url: https://intake-sql.readthedocs.io/
+  doc_url: https://intake-sql.readthedocs.io
   dev_url: https://github.com/intake/intake-sql
 
 extra:
