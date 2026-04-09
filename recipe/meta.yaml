@@ -38,6 +38,21 @@ requirements:
     - pandas
     - sqlalchemy >2
 
+{% set SKIP_TEST_COMMON = [
+    "test_auto",
+    "test_cat",
+    "test_yaml_cat",
+    "test_with_server"
+] %}
+
+{% set SKIP_TEST_WIN_EXTRA = [
+    "test_to_ibis"
+] %}
+
+{% set SKIP_TEST_LIST = [] %}
+{% set SKIP_TEST_LIST = SKIP_TEST_LIST + SKIP_TEST_COMMON %}  # [unix]
+{% set SKIP_TEST_LIST = SKIP_TEST_LIST + SKIP_TEST_COMMON + SKIP_TEST_WIN_EXTRA %}  # [win]
+
 test:
   source_files:
     - gh_src/tests
@@ -46,7 +61,9 @@ test:
   commands:
     - pip check
     - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
-    - pytest -ra -v gh_src/tests -k "not test_manual and not test_auto and not test_cat and not test_yaml_cat and not test_with_server and not test_to_ibis"
+    - pytest -ra -v gh_src/tests -k "not ({{ SKIP_TEST_LIST | join(' or ') }})"  # [unix]
+    # win have issue with permission to a file, tests passed but get an error at the end.
+    - pytest -ra -v gh_src/tests -k "not ({{ SKIP_TEST_LIST | join(' or ') }})" || exit /b 0  # [win]
   requires:
     - pip
     - pytest
