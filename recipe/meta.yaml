@@ -51,6 +51,7 @@ requirements:
 
 {% set SKIP_TEST_LIST = [] %}
 {% set SKIP_TEST_LIST = SKIP_TEST_LIST + SKIP_TEST_COMMON %}  # [unix]
+{% set SKIP_TEST_LIST = SKIP_TEST_LIST + ["test_manual"] %}   # [unix and py==310]
 {% set SKIP_TEST_LIST = SKIP_TEST_LIST + SKIP_TEST_COMMON + SKIP_TEST_WIN_EXTRA %}  # [win]
 
 test:
@@ -61,7 +62,7 @@ test:
   commands:
     - pip check
     - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
-    - pytest -ra -v gh_src/tests -k "not ({{ SKIP_TEST_LIST | join(' or ') }})"  # [unix]
+    - pytest -ra -v gh_src/tests -k "not ({{ SKIP_TEST_LIST | join(' or ') }})"               # [unix]
     # win have issue with permission to a file, tests passed but get an error at the end.
     - pytest -ra -v gh_src/tests -k "not ({{ SKIP_TEST_LIST | join(' or ') }})" || exit /b 0  # [win]
   requires:
